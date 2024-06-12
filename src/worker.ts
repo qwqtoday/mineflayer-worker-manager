@@ -30,7 +30,7 @@ export class MineflayerBotWorkerThread {
         this.options = workerData
         this.setDefaultOptions()
 
-        parentPort.on("message", this.handleMessage)
+        parentPort.on("message", (msg) => this.handleMessage(msg))
     }
 
     handleEventMessage(msg: EventMessage) {
@@ -40,7 +40,7 @@ export class MineflayerBotWorkerThread {
                 return;
         }
     }
-    
+
     handleMessage(msg: Message) {
         switch (msg.type) {
             case "event":
@@ -49,8 +49,6 @@ export class MineflayerBotWorkerThread {
         }
     }
 
-    
-    
     setDefaultOptions() {
         this.options.host ??= "localhost"
         this.options.port ??= 25565
