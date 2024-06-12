@@ -41,16 +41,6 @@ export class MineflayerBotWorkerManager extends EventEmitter {
             state: "OFFLINE"
         }
 
-        const handleMessage = (msg: Message) => {
-            switch (msg.type) {
-                case "event":
-                    this.handleWorkerEventMessage(worker, msg)
-                    break
-            }
-        }
-
-        worker._worker.on("message", handleMessage)
-
         this.workers.set(worker.options.name, worker)
     }
 
@@ -65,6 +55,15 @@ export class MineflayerBotWorkerManager extends EventEmitter {
         worker._worker = new Worker(this.options.workerFilePath, {
             workerData: worker.options,
         }) 
+
+        const handleMessage = (msg: Message) => {
+            switch (msg.type) {
+                case "event":
+                    this.handleWorkerEventMessage(worker, msg)
+                    break
+            }
+        }
+        worker._worker.on("message", handleMessage)
     }
 
     stopWorker(workerName: string) : Promise<number> {
