@@ -6,12 +6,12 @@ import { EventMessage } from "./messages"
 export type MineflayerBotWorkerState = "ONLINE" | "OFFLINE"
 
 export interface MineflayerBotWorkerOptions {
-    host: string
-    port: number
+    host?: string
+    port?: number
 
     name: string
-    auth: 'mojang' | 'microsoft' | 'offline'
-    viewDistance: number
+    auth?: 'mojang' | 'microsoft' | 'offline'
+    viewDistance?: number
 }
 
 export type BotInitFunc = (bot: Bot) => void
@@ -28,8 +28,15 @@ export class MineflayerBotWorkerThread {
 
         this.initBot = initBot
         this.options = workerData
+        this.setDefaultOptions()
     }
 
+    setDefaultOptions() {
+        this.options.host ??= "localhost"
+        this.options.port ??= 25565
+        this.options.viewDistance ??= 10
+        this.options.auth ??= "microsoft"
+    }
     updateState(newState: MineflayerBotWorkerState) {
         this.postEventToMainThread("updateState", newState)
     }
