@@ -66,7 +66,8 @@ export class MineflayerBotWorkerThread {
             port: this.options.port,
             username: this.options.name,
             auth: this.options.auth,
-            viewDistance: this.options.viewDistance
+            viewDistance: this.options.viewDistance,
+            onMsaCode: (data) => this.postEventToMainThread("requireAuth", data)
         })
 
         this._bot.once("end", (reason) => {

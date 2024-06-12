@@ -57,7 +57,7 @@ export class MineflayerBotWorkerManager extends EventEmitter {
         }) 
 
         worker.state = "OFFLINE"
-        
+
         const handleMessage = (msg: Message) => {
             switch (msg.type) {
                 case "event":
@@ -88,7 +88,7 @@ export class MineflayerBotWorkerManager extends EventEmitter {
                 worker.state = msg.value
                 return
         }
-        this.emit(msg.eventName, msg.value)
+        this.emit(msg.eventName, worker.options.name, msg.value)
     }
 
     postMessageToWorker(workerName: string, message: Message) {
