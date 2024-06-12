@@ -1,6 +1,7 @@
 import { Worker, isMainThread } from "worker_threads"
 import { MineflayerBotWorkerOptions, MineflayerBotWorkerState } from "./worker"
 import { EventMessage, Message } from "./messages"
+import { EventEmitter } from "stream"
 
 export interface MineflayerBotWorkerManagerOptions {
     workerFilePath: string
@@ -13,13 +14,14 @@ export interface MineflayerBotWorker {
     state: MineflayerBotWorkerState
 }
 
-export class MineflayerBotWorkerManager {
+export class MineflayerBotWorkerManager extends EventEmitter {
     options: MineflayerBotWorkerManagerOptions
     workers: Map<string, MineflayerBotWorker>
 
     constructor(options: MineflayerBotWorkerManagerOptions) {
         if (!isMainThread)
             throw new Error("Worker manager must be started in main thread.")
+        super()
 
         this.options = options
         this.workers = new Map()
@@ -51,7 +53,8 @@ export class MineflayerBotWorkerManager {
         switch (msg.eventName) {
             case "updateState":
                 worker.state = msg.value
-                break;
+                return
         }
+        this.emit(msg.eventName, msg.value)
     }
 }
