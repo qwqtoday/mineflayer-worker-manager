@@ -1,0 +1,26 @@
+{
+  "name": "mineflayer-worker-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublish": "npx tsc",
+    "prepack": "npx tsc",
+    "install": "npx tsc"
+  },
+  "keywords": [
+    "mineflayer",
+    "minecraft-bot"
+  ],
+  "author": "qwqtoday",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "events": "^3.3.0",
+    "mineflayer": "^4.20.1",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2"
+  }
+}
