@@ -30,11 +30,11 @@ export class MineflayerBotWorkerThread {
         this.options = workerData
     }
 
-    protected updateState(newState: MineflayerBotWorkerState) {
+    updateState(newState: MineflayerBotWorkerState) {
         this.postEventToMainThread("updateState", newState)
     }
 
-    protected startBot() {
+    startBot() {
         this._bot = createBot({
             host: this.options.host,
             port: this.options.port,
