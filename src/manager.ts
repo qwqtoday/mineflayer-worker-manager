@@ -38,7 +38,7 @@ export class MineflayerBotWorkerManager extends EventEmitter {
         const worker: MineflayerBotWorker = {
             _worker: null,
             options: options,
-            state: "OFFLINE"
+            state: "STOPPED"
         }
 
         this.workers.set(worker.options.name, worker)
@@ -56,6 +56,8 @@ export class MineflayerBotWorkerManager extends EventEmitter {
             workerData: worker.options,
         }) 
 
+        worker.state = "OFFLINE"
+        
         const handleMessage = (msg: Message) => {
             switch (msg.type) {
                 case "event":
