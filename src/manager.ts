@@ -36,9 +36,7 @@ export class MineflayerBotWorkerManager extends EventEmitter {
 
     addWorker(options: MineflayerBotWorkerOptions) {
         const worker: MineflayerBotWorker = {
-            _worker: new Worker(this.options.workerFilePath, {
-                workerData: options,
-            }),
+            _worker: null,
             options: options,
             state: "OFFLINE"
         }
@@ -56,6 +54,33 @@ export class MineflayerBotWorkerManager extends EventEmitter {
         this.workers.set(worker.options.name, worker)
     }
 
+    startWorker(workerName: string) {
+        const worker = this.workers.get(workerName)
+        if (worker === undefined)
+            throw new Error("Worker not found.")
+
+        if (worker.state !== "STOPPED")
+            throw new Error("Worker is not stopped")
+
+        worker._worker = new Worker(this.options.workerFilePath, {
+            workerData: worker.options,
+        }) 
+    }
+
+    stopWorker(workerName: string) : Promise<number> {
+        const worker = this.workers.get(workerName)
+        if (worker === undefined)
+            throw new Error("Worker not found.")
+
+        if (worker.state === "STOPPED")
+            throw new Error("Worker is already stopped")
+
+        const workerTerminatePromise = worker._worker.terminate()
+        worker._worker = null
+
+        return workerTerminatePromise
+    }
+
     handleWorkerEventMessage(worker: MineflayerBotWorker, msg: EventMessage) {
         switch (msg.eventName) {
             case "updateState":
@@ -67,6 +92,8 @@ export class MineflayerBotWorkerManager extends EventEmitter {
 
     postMessageToWorker(workerName: string, message: Message) {
         const worker = this.workers.get(workerName)
+        if (worker === undefined)
+            throw new Error("Worker not found.")
         worker._worker.postMessage(message)
     }
 
