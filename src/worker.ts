@@ -1,6 +1,6 @@
 import  { isMainThread, workerData, parentPort } from "worker_threads"
 import { Bot, createBot } from "mineflayer"
-import { EventMessage } from "./messages"
+import { EventMessage, Message } from "./messages"
 
 
 export type MineflayerBotWorkerState = "ONLINE" | "OFFLINE"
@@ -29,14 +29,33 @@ export class MineflayerBotWorkerThread {
         this.initBot = initBot
         this.options = workerData
         this.setDefaultOptions()
+
+        parentPort.on("message", this.handleMessage)
     }
 
+    handleMessage(msg: Message) {
+        switch (msg.type) {
+            case "event":
+                this.handleEventMessage(msg)
+                return
+        }
+    }
+
+    handleEventMessage(msg: EventMessage) {
+        switch (msg.eventName) {
+            case "startBot":
+                this.startBot()
+                return;
+        }
+    }
+    
     setDefaultOptions() {
         this.options.host ??= "localhost"
         this.options.port ??= 25565
         this.options.viewDistance ??= 10
         this.options.auth ??= "microsoft"
     }
+
     updateState(newState: MineflayerBotWorkerState) {
         this.postEventToMainThread("updateState", newState)
     }

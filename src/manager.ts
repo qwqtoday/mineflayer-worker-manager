@@ -5,7 +5,7 @@ import { EventEmitter } from "stream"
 
 export interface MineflayerBotWorkerManagerOptions {
     workerFilePath: string
-
+    restartDelayMS?: number
 }
 
 export interface MineflayerBotWorker {
@@ -22,15 +22,22 @@ export class MineflayerBotWorkerManager extends EventEmitter {
         if (!isMainThread)
             throw new Error("Worker manager must be started in main thread.")
         super()
+        this.workers = new Map()
 
         this.options = options
-        this.workers = new Map()
+        this.setDefaultOptions()
+
+        this.startHandle()
+    }
+
+    setDefaultOptions() {
+        this.options.restartDelayMS ??= 5000
     }
 
     addWorker(options: MineflayerBotWorkerOptions) {
         const worker: MineflayerBotWorker = {
             _worker: new Worker(this.options.workerFilePath, {
-                workerData: options
+                workerData: options,
             }),
             options: options,
             state: "OFFLINE"
@@ -56,5 +63,30 @@ export class MineflayerBotWorkerManager extends EventEmitter {
                 return
         }
         this.emit(msg.eventName, msg.value)
+    }
+
+    postMessageToWorker(workerName: string, message: Message) {
+        const worker = this.workers.get(workerName)
+        worker._worker.postMessage(message)
+    }
+
+    postEventToWorker(workerName: string, eventName: string, value?: any) {
+        this.postMessageToWorker(workerName, {
+            type: "event",
+            eventName: eventName,
+            value: value
+        } as EventMessage)
+    }
+
+    private startHandle() {
+        const findAndStartOfflineWorker = () => {
+            for (let [key, worker] of this.workers) {
+                if (worker.state === "OFFLINE") {
+                    this.postEventToWorker(key, "startBot")
+                    return
+                }
+            }
+        }
+        setInterval(findAndStartOfflineWorker, this.options.restartDelayMS)
     }
 }
