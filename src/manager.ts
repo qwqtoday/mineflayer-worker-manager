@@ -77,6 +77,7 @@ export class MineflayerBotWorkerManager extends EventEmitter {
             throw new Error("Worker is already stopped")
 
         const workerTerminatePromise = worker._worker.terminate()
+        worker.state = "STOPPED"
         worker._worker = null
 
         return workerTerminatePromise

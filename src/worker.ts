@@ -3,7 +3,7 @@ import { Bot, createBot } from "mineflayer"
 import { EventMessage, Message } from "./messages"
 
 
-export type MineflayerBotWorkerState = "ONLINE" | "OFFLINE" | "STOPPED"
+export type MineflayerBotWorkerState = "ONLINE" | "OFFLINE" | "STOPPED" | "STARTING"
 
 export interface MineflayerBotWorkerOptions {
     host?: string
@@ -61,6 +61,8 @@ export class MineflayerBotWorkerThread {
     }
 
     startBot() {
+        this.updateState("STARTING")
+        
         this._bot = createBot({
             host: this.options.host,
             port: this.options.port,
