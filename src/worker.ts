@@ -33,6 +33,14 @@ export class MineflayerBotWorkerThread {
         parentPort.on("message", this.handleMessage)
     }
 
+    handleEventMessage(msg: EventMessage) {
+        switch (msg.eventName) {
+            case "startBot":
+                this.startBot()
+                return;
+        }
+    }
+    
     handleMessage(msg: Message) {
         switch (msg.type) {
             case "event":
@@ -41,13 +49,7 @@ export class MineflayerBotWorkerThread {
         }
     }
 
-    handleEventMessage(msg: EventMessage) {
-        switch (msg.eventName) {
-            case "startBot":
-                this.startBot()
-                return;
-        }
-    }
+    
     
     setDefaultOptions() {
         this.options.host ??= "localhost"
