@@ -31,11 +31,7 @@ export class MineflayerBotWorkerThread {
     }
 
     protected updateState(newState: MineflayerBotWorkerState) {
-        parentPort.postMessage({
-            type: "event",
-            eventName: "updateState",
-            value: newState as MineflayerBotWorkerState
-        } as EventMessage)
+        this.postEventToMainThread("updateState", newState)
     }
 
     protected startBot() {
@@ -55,5 +51,13 @@ export class MineflayerBotWorkerThread {
             this.updateState("ONLINE")
             this.initBot(this._bot)
         })
+    }
+
+    postEventToMainThread(eventName: string, value: any) {
+        parentPort.postMessage({
+            type: "event",
+            eventName: eventName,
+            value: value
+        } as EventMessage)
     }
 }
