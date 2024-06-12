@@ -6,6 +6,7 @@ import { EventEmitter } from "stream"
 export interface MineflayerBotWorkerManagerOptions {
     workerFilePath: string
     restartDelayMS?: number
+    autoStart?: boolean
 }
 
 export interface MineflayerBotWorker {
@@ -32,6 +33,7 @@ export class MineflayerBotWorkerManager extends EventEmitter {
 
     setDefaultOptions() {
         this.options.restartDelayMS ??= 5000
+        this.options.autoStart = this.options.autoStart === undefined ? true : this.options.autoStart
     }
 
     addWorker(options: MineflayerBotWorkerOptions) {
@@ -42,6 +44,9 @@ export class MineflayerBotWorkerManager extends EventEmitter {
         }
 
         this.workers.set(worker.options.name, worker)
+        if (this.options.autoStart) {
+            this.startWorker(worker.options.name)
+        }
     }
 
     startWorker(workerName: string) {
