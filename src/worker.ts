@@ -2,6 +2,12 @@ import  { isMainThread, workerData, parentPort } from "worker_threads"
 import { Bot, createBot } from "mineflayer"
 import { EventMessage, Message } from "./messages"
 
+declare module "mineflayer" {
+    interface Bot {
+        workerThread: MineflayerBotWorkerThread
+    }
+}
+
 
 export type MineflayerBotWorkerState = "ONLINE" | "OFFLINE" | "STOPPED" | "STARTING"
 
@@ -71,7 +77,9 @@ export class MineflayerBotWorkerThread {
             viewDistance: this.options.viewDistance,
             onMsaCode: (data) => this.postEventToMainThread("requireAuth", data)
         })
-
+        
+        this._bot.workerThread = this
+        
         this._bot.once("end", (reason) => {
             this.updateState("OFFLINE")
         })
